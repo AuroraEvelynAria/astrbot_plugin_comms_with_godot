@@ -22,18 +22,30 @@ extends Node
 ## 是否只接收本会话消息（false 则接收所有消息）
 @export var filter_by_umo: bool = false
 
-## 连接状态
-var is_connected: bool:
-	get:
-		if AstrBotBridge and AstrBotBridge.is_server_connected():
-			return true
-		return false
+## 延迟连接 autoload 信号（避免解析时找不到 autoload）
+var _bridge: Node = null
 
 
 func _ready() -> void:
-	if not Engine.is_editor_hint():
-		AstrBotBridge.message_received.connect(_on_bridge_message)
-		AstrBotBridge.connection_changed.connect(_on_connection_changed)
+	if Engine.is_editor_hint():
+		return
+	# 运行时查找 autoload 单例
+	_bridge = get_node_or_null("/root/AstrBotBridge")
+	if _bridge == null:
+		push_warning("[AstrBotHandler] 未找到 AstrBotBridge autoload，请确认插件已启用")
+		return
+	if _bridge.has_signal("message_received"):
+		_bridge.message_received.connect(_on_bridge_message)
+	if _bridge.has_signal("connection_changed"):
+		_bridge.connection_changed.connect(_on_connection_changed)
+
+
+## 连接状态
+var is_connected: bool:
+	get:
+		if _bridge and _bridge.has_method("is_server_connected"):
+			return _bridge.is_server_connected()
+		return false
 
 
 ## 发送文本消息到绑定的会话
@@ -41,12 +53,14 @@ func send_message(text: String) -> void:
 	if umo.is_empty():
 		push_warning("[AstrBotHandler] umo 未设置，无法发送消息")
 		return
-	AstrBotBridge.send_text(umo, text)
+	if _bridge:
+		_bridge.send_text(umo, text)
 
 
 ## 发送到指定会话
 func send_message_to(target_umo: String, text: String) -> void:
-	AstrBotBridge.send_text(target_umo, text)
+	if _bridge:
+		_bridge.send_text(target_umo, text)
 
 
 ## 发送并等待 AI 回复
@@ -54,7 +68,8 @@ func send_and_wait(text: String, callback: Callable, timeout: float = 30.0) -> v
 	if umo.is_empty():
 		push_warning("[AstrBotHandler] umo 未设置，无法发送消息")
 		return
-	AstrBotBridge.send_and_wait(umo, text, callback, timeout)
+	if _bridge:
+		_bridge.send_and_wait(umo, text, callback, timeout)
 
 
 # ════════════════════════════════════════════════════════════════════
@@ -62,9 +77,6 @@ func send_and_wait(text: String, callback: Callable, timeout: float = 30.0) -> v
 # ════════════════════════════════════════════════════════════════════
 
 ## 收到消息时调用。子类重写此方法处理消息。
-##   text   — 消息文本
-##   sender — 发送者名称
-##   data   — 完整消息 Dictionary（含 sender_id, umo, platform, timestamp 等）
 func _on_message(_text: String, _sender: String, _data: Dictionary) -> void:
 	pass
 
@@ -79,11 +91,9 @@ func _on_connection_changed(_connected: bool) -> void:
 # ════════════════════════════════════════════════════════════════════
 
 func _on_bridge_message(data: Dictionary) -> void:
-	# UMO 过滤
 	if filter_by_umo and not umo.is_empty():
 		if data.get("umo", "") != umo:
 			return
-
 	var text: String = data.get("text", "")
 	var sender: String = data.get("sender", "unknown")
 	_on_message(text, sender, data)
