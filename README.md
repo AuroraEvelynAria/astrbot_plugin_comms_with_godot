@@ -54,7 +54,7 @@ godot_addon/             ← 复制 addons/ 到你的 Godot 项目
 #### 方式一：使用 AstrBotHandler（推荐）
 
 ```gdscript
-# 小玲.gd — 继承 AstrBotHandler
+# 猫娘.gd — 继承 AstrBotHandler
 extends AstrBotHandler
 
 func _ready() -> void:
@@ -66,7 +66,7 @@ func _on_message(text: String, sender: String, data: Dictionary) -> void:
 
     if "跳舞" in text:
         $AnimationPlayer.play("dance")
-        send_message("小玲开始跳舞啦~")
+        send_message("猫娘开始跳舞啦~")
     elif "过来" in text:
         walk_to_player()
 
