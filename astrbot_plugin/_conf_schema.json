@@ -1,38 +1,38 @@
-[
-  {
-    "name": "server_host",
-    "description": "监听地址。0.0.0.0 允许外部访问，127.0.0.1 仅本机。",
+{
+  "server_host": {
     "type": "string",
+    "description": "监听地址",
+    "hint": "0.0.0.0 允许外部访问，127.0.0.1 仅本机。",
     "default": "0.0.0.0"
   },
-  {
-    "name": "server_port",
-    "description": "HTTP 服务端口。Godot 端需填相同端口。",
+  "server_port": {
     "type": "int",
+    "description": "HTTP/WebSocket 服务端口",
+    "hint": "Godot 端需填相同端口。修改后需重启插件。",
     "default": 18230
   },
-  {
-    "name": "api_key",
-    "description": "API 密钥（可选）。留空则不验证，填写后 Godot 端必须在 Header 中携带 X-API-Key。",
+  "api_key": {
     "type": "string",
+    "description": "API 密钥",
+    "hint": "留空则不验证。填写后 Godot 端必须在 Header 或 URL 参数中携带此 Key。",
     "default": ""
   },
-  {
-    "name": "max_queue_size",
-    "description": "消息队列最大容量。超出后自动丢弃最旧消息。",
+  "max_queue_size": {
     "type": "int",
+    "description": "消息队列最大容量",
+    "hint": "超出后自动丢弃最旧消息。",
     "default": 200
   },
-  {
-    "name": "message_ttl",
-    "description": "消息过期时间（秒）。过期消息自动清理，0 表示永不过期。",
+  "message_ttl": {
     "type": "int",
+    "description": "消息过期时间（秒）",
+    "hint": "过期消息自动清理。设置为 0 表示永不过期。",
     "default": 3600
   },
-  {
-    "name": "enable_cors",
-    "description": "启用 CORS 跨域支持。如果 Godot 和 AstrBot 在同一机器上可关闭。",
+  "enable_cors": {
     "type": "bool",
+    "description": "启用 CORS 跨域支持",
+    "hint": "如果 Godot 和 AstrBot 在同一机器上可关闭。",
     "default": true
   }
-]
+}
