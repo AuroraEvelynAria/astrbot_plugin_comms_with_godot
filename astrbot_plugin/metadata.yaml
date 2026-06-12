@@ -1,0 +1,7 @@
+name: astrbot_bridge
+display_name: AstrBot × Godot 通信桥
+desc: 通用双向 HTTP 通信桥，让 AstrBot AI 角色能与 Godot 引擎实时交互。支持消息队列、主动发送、AI 回复。
+version: v1.0
+author: NachoNeko
+repo: https://github.com/AstrBotDevs/astrbot_plugin_godot_bridge
+astrbot_version: ">=4.8.0"
